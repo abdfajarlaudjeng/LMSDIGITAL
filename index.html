@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduConnect - Portal Digital Interaktif</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .portal-bg { background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%); }
+        .slide { opacity: 0; transition: opacity 1s ease-in-out; position: absolute; inset: 0; }
+        .slide.active { opacity: 1; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans antialiased text-slate-800">
+
+    <div id="login-screen" class="portal-bg min-h-screen flex items-center justify-center p-0 sm:p-6">
+        <div class="bg-white w-full max-w-5xl min-h-[600px] sm:rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+            
+            <div class="hidden lg:block lg:col-span-6 relative bg-slate-900 overflow-hidden text-white">
+                <div class="slide active">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-30">
+                    <div class="absolute bottom-12 left-8 right-8 z-10">
+                        <span class="bg-blue-600 text-xs font-bold px-3 py-1 rounded-full">Dashboard Guru</span>
+                        <h3 class="text-2xl font-bold mt-2">Kelola Kelas Lebih Mudah</h3>
+                        <p class="text-sm text-slate-300 mt-1">Input perkembangan nilai akademik dan kehadiran siswa dalam satu klik terintegrasi.</p>
+                    </div>
+                </div>
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-30">
+                    <div class="absolute bottom-12 left-8 right-8 z-10">
+                        <span class="bg-emerald-600 text-xs font-bold px-3 py-1 rounded-full">Akses Orang Tua</span>
+                        <h3 class="text-2xl font-bold mt-2">Pantau Progress Buah Hati</h3>
+                        <p class="text-sm text-slate-300 mt-1">Transparansi penuh data raport harian, presensi, dan evaluasi guru secara real-time.</p>
+                    </div>
+                </div>
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-30">
+                    <div class="absolute bottom-12 left-8 right-8 z-10">
+                        <span class="bg-purple-600 text-xs font-bold px-3 py-1 rounded-full">Sistem Pengawas</span>
+                        <h3 class="text-2xl font-bold mt-2">Analisis Mutu Sekolah</h3>
+                        <p class="text-sm text-slate-300 mt-2">Membantu Kepala Sekolah memantau statistik kurikulum serta kinerja guru aktif.</p>
+                    </div>
+                </div>
+                <div class="absolute bottom-6 left-8 flex gap-2 z-20">
+                    <div class="dot w-6 h-1.5 bg-white rounded-full transition-all"></div>
+                    <div class="dot w-2 h-1.5 bg-white/50 rounded-full transition-all"></div>
+                    <div class="dot w-2 h-1.5 bg-white/50 rounded-full transition-all"></div>
+                </div>
+            </div>
+
+            <div class="col-span-1 lg:col-span-6 flex flex-col justify-center p-8 sm:p-12">
+                <div class="mb-6">
+                    <div class="bg-blue-700 w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl mb-3"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h2 class="text-2xl font-black text-slate-900">EduConnect Portal</h2>
+                    <p class="text-sm text-slate-500 mt-1">Silakan masuk menggunakan kredensial sistem Anda</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email Pengguna</label>
+                        <input type="email" id="email" required placeholder="guru@sekolah.com atau orangtua@mail.com" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none transition bg-slate-50">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
+                        <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none transition bg-slate-50">
+                    </div>
+                    <button type="submit" id="btn-login" class="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition">Masuk Portal <i class="fa-solid fa-right-to-bracket ml-2"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-screen" class="min-h-screen hidden">
+        <header class="bg-blue-900 text-white py-4 px-6 shadow-md flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight flex items-center gap-2"><i class="fa-solid fa-school"></i> EduConnect Workspace</h1>
+                <p class="text-xs text-blue-200">User Aktif: <span id="user-display-name" class="font-bold">Nama</span> (<span id="user-display-role" class="italic">Role</span>)</p>
+            </div>
+            <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-sm px-4 py-2 rounded-xl transition font-medium"><i class="fa-solid fa-power-off"></i> Keluar</button>
+        </header>
+
+        <main class="max-w-7xl mx-auto p-4 sm:p-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-amber-500">
+                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Rata-Rata Akademik Sekolah</p>
+                    <h2 id="summary-nilai" class="text-3xl font-black text-slate-800 mt-1">0</h2>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-blue-600">
+                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Total Entri Pelajaran</p>
+                    <h2 id="summary-entri" class="text-3xl font-black text-slate-800 mt-1">0</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <div id="wrapper-input-guru" class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm hidden">
+                    <h3 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4"><i class="fa-solid fa-file-pen text-blue-700 mr-2"></i> Form Input Guru</h3>
+                    <form onsubmit="handleGuruInput(event)">
+                        <div class="mb-3">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Nama Lengkap Siswa</label>
+                            <input type="text" id="siswa" required placeholder="Nama Siswa..." class="w-full px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Mata Pelajaran</label>
+                            <select id="mapel" required class="w-full px-3 py-2 border rounded-xl bg-white">
+                                <option value="Matematika">Matematika</option>
+                                <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                                <option value="IPA (Sains)">IPA (Sains)</option>
+                                <option value="Bahasa Inggris">Bahasa Inggris</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Nilai Akhir</label>
+                                <input type="number" id="nilai" min="0" max="100" required class="w-full px-3 py-2 border rounded-xl">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Presensi</label>
+                                <select id="kehadiran" class="w-full px-3 py-2 border rounded-xl bg-white">
+                                    <option value="Hadir">Hadir</option>
+                                    <option value="Izin">Izin</option>
+                                    <option value="Alfa">Alfa</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Catatan Evaluasi / Pesan</label>
+                            <textarea id="catatan" rows="3" placeholder="Pesan untuk Orang Tua..." class="w-full px-3 py-2 border rounded-xl"></textarea>
+                        </div>
+                        <button type="submit" id="btn-simpan-guru" class="w-full bg-blue-700 hover:bg-blue-800 text-white py-2.5 rounded-xl font-bold transition">Simpan Laporan</button>
+                    </form>
+                </div>
+
+                <div id="wrapper-tabel-display" class="lg:col-span-12 bg-white p-6 rounded-2xl shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4 flex justify-between items-center">
+                        <span><i class="fa-solid fa-list-check text-blue-700 mr-2"></i> Panel Riwayat Akademik & Catatan</span>
+                        <button onclick="fetchAkademikData()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl font-semibold"><i class="fa-solid fa-arrows-rotate"></i> Sinkronisasi</button>
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-500 font-bold border-b text-xs uppercase tracking-wider">
+                                    <th class="p-3">Siswa</th>
+                                    <th class="p-3">Mata Pelajaran</th>
+                                    <th class="p-3 text-center">Nilai</th>
+                                    <th class="p-3 text-center">Kehadiran</th>
+                                    <th class="p-3">Catatan / Evaluasi</th>
+                                    <th class="p-3">Wali Kelas (Input)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-body-data">
+                                <tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Memuat data akademik...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // MASUKKAN URL GOOGLE APPS SCRIPT WEB APP ANDA DI SINI
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLT4eKgaWxW_JUAtLIXdaV5cOajFBq_uqYOpdHxFHcj3a7fLm-TZH4H4czJItwBIUC/exec";
+
+        // Kontrol Image Slider Otomatis
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('w-6', 'bg-white');
+            dots[currentSlide].classList.add('w-2', 'bg-white/50');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.remove('w-2', 'bg-white/50');
+            dots[currentSlide].classList.add('w-6', 'bg-white');
+        }, 4000);
+
+        // Cek Sesi Halaman Saat Dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            if(localStorage.getItem("eduLoggedIn") === "true") {
+                renderDashboardLayout();
+            }
+        });
+
+        // 1. PROSES AUTHENTICATION LOGIN
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Menghubungkan Portal...`;
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "login",
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    localStorage.setItem("eduLoggedIn", "true");
+                    localStorage.setItem("eduName", data.user.nama);
+                    localStorage.setItem("eduRole", data.user.peran);
+                    renderDashboardLayout();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(() => alert("Koneksi gagal. Periksa URL Script Anda."))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = `Masuk Portal <i class="fa-solid fa-right-to-bracket ml-2"></i>`;
+            });
+        }
+
+        // 2. LOGOUT SYSTEM
+        function handleLogout() {
+            localStorage.clear();
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        // 3. ATUR LAYOUT HAK AKSES KERJA
+        function renderDashboardLayout() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+            
+            const role = localStorage.getItem("eduRole");
+            const nama = localStorage.getItem("eduName");
+            
+            document.getElementById('user-display-name').innerText = nama;
+            document.getElementById('user-display-role').innerText = role;
+
+            const inputGuruWrapper = document.getElementById('wrapper-input-guru');
+            const tableWrapper = document.getElementById('wrapper-tabel-display');
+
+            if (role === "Guru") {
+                inputGuruWrapper.classList.remove('hidden');
+                tableWrapper.classList.replace('lg:col-span-12', 'lg:col-span-8');
+            } else {
+                inputGuruWrapper.classList.add('hidden');
+                tableWrapper.classList.replace('lg:col-span-8', 'lg:col-span-12');
+            }
+            fetchAkademikData();
+        }
+
+        // 4. AMBIL DATA DARI SPREADSHEET (GET)
+        function fetchAkademikData() {
+            const tableBody = document.getElementById('tabel-body-data');
+            const role = localStorage.getItem("eduRole");
+            const nama = localStorage.getItem("eduName");
+
+            fetch(SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('summary-nilai').innerText = data.summary.rataRataSekolah;
+                    document.getElementById('summary-entri').innerText = data.summary.totalEntri;
+
+                    tableBody.innerHTML = '';
+                    
+                    // Filter Logika Tampilan Berdasarkan Role
+                    // Orang Tua hanya bisa melihat nama siswa yang sesuai/mengandung nama mereka atau seluruh data untuk demonstrasi
+                    let recordsToDisplay = data.records;
+                    
+                    if(role === "OrangTua") {
+                        // Fitur protektif: Orang tua hanya melihat nama anak mereka (contoh skema filter)
+                        // recordsToDisplay = data.records.filter(r => r.siswa.includes(nama));
+                    }
+
+                    if(recordsToDisplay.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada arsip laporan akademik.</td></tr>`;
+                        return;
+                    }
+
+                    recordsToDisplay.forEach(item => {
+                        let badgeKehadiran = item.kehadiran === "Hadir" ? "bg-emerald-100 text-emerald-800" : (item.kehadiran === "Izin" ? "bg-amber-100 text-amber-800" : "bg-rose-100 text-rose-800");
+                        let badgeNilai = item.nilai >= 75 ? "text-emerald-600 font-bold" : "text-rose-600 font-bold";
+
+                        const tr = document.createElement('tr');
+                        tr.className = "border-b hover:bg-slate-50 transition";
+                        tr.innerHTML = `
+                            <td class="p-3 font-semibold text-slate-700">${item.siswa}</td>
+                            <td class="p-3">${item.mapel}</td>
+                            <td class="p-3 text-center ${badgeNilai}">${item.nilai}</td>
+                            <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${badgeKehadiran}">${item.kehadiran}</span></td>
+                            <td class="p-3 text-slate-600 italic text-xs max-w-xs truncate" title="${item.catatan}">${item.catatan || '-'}</td>
+                            <td class="p-3 text-slate-400 text-xs">${item.guru}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                })
+                .catch(() => {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-500">Gagal mengunduh pangkalan data nilai.</td></tr>`;
+                });
+        }
+
+        // 5. PROSES INPUT DATA OLEH GURU (POST)
+        function handleGuruInput(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-simpan-guru');
+            btn.disabled = true;
+            btn.innerText = "Mengamankan Data...";
+
+            const payload = {
+                action: "inputNilai",
+                nama_siswa: document.getElementById('siswa').value,
+                mata_pelajaran: document.getElementById('mapel').value,
+                nilai: document.getElementById('nilai').value,
+                kehadiran: document.getElementById('kehadiran').value,
+                catatan_guru: document.getElementById('catatan').value,
+                input_oleh: localStorage.getItem("eduName")
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert("Berhasil! Laporan perkembangan siswa dikirim ke pangkalan data cloud.");
+                document.getElementById('siswa').value = '';
+                document.getElementById('nilai').value = '';
+                document.getElementById('catatan').value = '';
+                fetchAkademikData();
+            })
+            .catch(() => alert("Gagal menyimpan data."))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerText = "Simpan Laporan";
+            });
+        }
+    </script>
+</body>
+</html>

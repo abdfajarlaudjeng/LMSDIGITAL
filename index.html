@@ -77,7 +77,10 @@
                 <h1 class="text-xl font-bold tracking-tight flex items-center gap-2"><i class="fa-solid fa-layer-group text-blue-500"></i> Portal Pembelajaran Digital</h1>
                 <p class="text-xs text-slate-400">Pengguna: <span id="user-name" class="font-bold text-white">Nama</span> | Hak Akses: <span id="user-role" class="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-[11px] font-bold">Role</span></p>
             </div>
-            <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-sm px-4 py-2 rounded-xl transition font-medium"><i class="fa-solid fa-power-off mr-1"></i> Keluar</button>
+            <div class="flex items-center gap-3">
+                <button onclick="syncSystemData()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl transition font-medium"><i class="fa-solid fa-arrows-rotate mr-1"></i> Sinkronisasi Data</button>
+                <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-sm px-4 py-2 rounded-xl transition font-medium"><i class="fa-solid fa-power-off mr-1"></i> Keluar</button>
+            </div>
         </header>
 
         <main class="max-w-7xl mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -91,7 +94,8 @@
                         <textarea id="mat-desk" placeholder="Ringkasan materi atau instruksi..." class="w-full p-2 border rounded-lg"></textarea>
                         <input type="url" id="mat-link" placeholder="Link Materi (Google Drive/PDF)" class="w-full p-2 border rounded-lg">
                         <input type="url" id="mat-meet" placeholder="Link Kelas Virtual (Google Meet/Zoom)" class="w-full p-2 border rounded-lg">
-                        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold">Rilis ke Siswa</button>
+                        <input type="url" id="mat-absen" placeholder="Link Absensi Kehadiran Siswa (Form)" class="w-full p-2 border rounded-lg bg-blue-50/50">
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition">Rilis ke Siswa</button>
                     </form>
                 </div>
 
@@ -105,14 +109,18 @@
                         </select>
                         <input type="text" id="ev-judul" placeholder="Judul Kuis/Tugas" required class="w-full p-2 border rounded-lg">
                         <textarea id="ev-ins" placeholder="Tulis instruksi pengerjaan..." class="w-full p-2 border rounded-lg"></textarea>
-                        <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-bold">Bagikan Alat Evaluasi</button>
+                        <input type="url" id="ev-link" placeholder="Link Kerjakan Tugas/Kuis (Google Form/Quizizz)" class="w-full p-2 border rounded-lg bg-emerald-50/50">
+                        <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-bold hover:bg-emerald-700 transition">Bagikan Alat Evaluasi</button>
                     </form>
                 </div>
 
                 <div class="bg-white p-5 rounded-2xl shadow-sm border">
                     <h3 class="font-bold text-slate-800 border-b pb-2 mb-3 text-sm"><i class="fa-solid fa-chart-line text-purple-600 mr-2"></i> Capaian & Pelacakan Progres</h3>
                     <form onsubmit="saveProgres(event)" class="space-y-3 text-xs">
-                        <input type="text" id="prog-siswa" placeholder="Nama Lengkap Siswa" required class="w-full p-2 border rounded-lg">
+                        <label class="block text-[11px] font-bold text-slate-500 mb-0.5">Nama Lengkap Siswa</label>
+                        <select id="prog-siswa" required class="w-full p-2 border rounded-lg bg-amber-50 font-medium">
+                            <option value="">-- Pilih Siswa Terdaftar --</option>
+                        </select>
                         <input type="text" id="prog-mapel" placeholder="Mata Pelajaran" required class="w-full p-2 border rounded-lg">
                         <input type="number" id="prog-nilai" placeholder="Capaian Nilai (0-100)" required class="w-full p-2 border rounded-lg">
                         <select id="prog-status" class="w-full p-2 border rounded-lg bg-white">
@@ -120,7 +128,7 @@
                             <option value="Sedang Berprogres">Sedang Berprogres</option>
                             <option value="Selesai Topik">Selesai Topik / Lulus</option>
                         </select>
-                        <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg font-bold">Update Progres Siswa</button>
+                        <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg font-bold hover:bg-purple-700 transition">Update Progres Siswa</button>
                     </form>
                 </div>
             </div>
@@ -130,23 +138,27 @@
                     <div class="bg-white p-5 rounded-2xl shadow-sm border">
                         <h4 class="font-bold text-slate-800 text-sm mb-3 flex justify-between items-center">
                             <span><i class="fa-solid fa-graduation-cap text-blue-600 mr-2"></i> Sinkronisasi Materi & Kelas</span>
-                            <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-extrabold uppercase">Live</span>
+                            <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">Live</span>
                         </h4>
-                        <div id="materi-container" class="space-y-3 max-h-60 overflow-y-auto pr-1 text-xs"></div>
+                        <div id="materi-container" class="space-y-3 max-h-60 overflow-y-auto pr-1 text-xs">
+                            <p class="text-slate-400 italic">Memuat modul materi...</p>
+                        </div>
                     </div>
 
                     <div class="bg-white p-5 rounded-2xl shadow-sm border">
                         <h4 class="font-bold text-slate-800 text-sm mb-3 flex justify-between items-center">
-                            <span><i class="fa-solid fa-paste text-emerald-600 mr-2"></i> Alat Evaluasi Terbuka</span>
+                            <span><i class="fa-solid fa-paste text-emerald-600 mr-2"></i> Alat Evaluasi Terbuka (Kuis/Tugas)</span>
                         </h4>
-                        <div id="evaluasi-container" class="space-y-3 max-h-60 overflow-y-auto pr-1 text-xs"></div>
+                        <div id="evaluasi-container" class="space-y-3 max-h-60 overflow-y-auto pr-1 text-xs">
+                            <p class="text-slate-400 italic">Memuat daftar tugas...</p>
+                        </div>
                     </div>
                 </div>
 
                 <div class="bg-white p-5 rounded-2xl shadow-sm border">
                     <h4 class="font-bold text-slate-800 text-sm mb-3 flex justify-between items-center">
                         <span><i class="fa-solid fa-chart-bar text-purple-600 mr-2"></i> <span id="title-progres-table">Capaian & Pelacakan Progres Belajar</span></span>
-                        <span id="badge-progres-scope" class="text-[10px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-extrabold uppercase">Memuat Scope...</span>
+                        <span id="badge-progres-scope" class="text-[10px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">Memuat Scope...</span>
                     </h4>
                     <div class="overflow-x-auto text-xs">
                         <table class="w-full text-left">
@@ -158,7 +170,11 @@
                                     <th class="p-2.5 text-center">Status Pelacakan</th>
                                 </tr>
                             </thead>
-                            <tbody id="progres-table-body"></tbody>
+                            <tbody id="progres-table-body">
+                                <tr>
+                                    <td colspan="4" class="p-4 text-center text-slate-400 italic">Memuat pangkalan progres...</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -166,7 +182,7 @@
                 <div id="forum-section" class="bg-white p-5 rounded-2xl shadow-sm border hidden">
                     <h4 class="font-bold text-slate-800 text-sm mb-3"><i class="fa-solid fa-comments text-amber-500 mr-2"></i> Forum Diskusi Komunitas Kelas</h4>
                     <form onsubmit="sendDiskusi(event)" class="flex gap-2 mb-4">
-                        <input type="text" id="forum-msg" required placeholder="Tulis tanggapan atau pertanyaan diskusi kelas di sini..." class="w-full px-3 py-2 text-xs border rounded-xl outline-none focus:ring-2 focus:ring-amber-500">
+                        <input type="text" id="forum-msg" required placeholder="Tulis pertanyaan atau tanggapan diskusi kelas di sini..." class="w-full px-3 py-2 text-xs border rounded-xl outline-none focus:ring-2 focus:ring-amber-500">
                         <button type="submit" class="bg-amber-500 text-slate-900 px-4 rounded-xl text-xs font-bold hover:bg-amber-400 transition">Kirim</button>
                     </form>
                     <div id="diskusi-container" class="space-y-3 max-h-48 overflow-y-auto text-xs pr-1"></div>
@@ -177,13 +193,18 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiKCEhdgFzV4yc5FUNz92IOUcmz2ZUz_RyC7UU4x2DWbzqpS7SgVmYdy3zJzc2lxZD/exec"; // GANTI DENGAN URL WEB APP ANDA
+        // PASTIKAN URL SCRIPT INI ADALAH URL WEB APP YANG SUDAH ANDA DEPLOY DI GOOGLE APPS SCRIPT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHD7EOG0SHzFTswKCUH1zLqhFcF0mkqzufMdN9g45fHYOC39W6eMCZum5maeQlWJ2F/exec"; 
 
-        // Slider Animasi Otomatis
+        // Global array untuk menyimpan nama-nama siswa hasil sinkronisasi
+        let globalSiswaList = [];
+
+        // Slider Animasi Otomatis Layar Masuk
         let curSlide = 0;
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('.dot');
         setInterval(() => {
+            if(slides.length === 0) return;
             slides[curSlide].classList.remove('active');
             dots[curSlide].classList.remove('w-6', 'bg-white');
             dots[curSlide].classList.add('w-2', 'bg-white/50');
@@ -198,6 +219,7 @@
             if(localStorage.getItem("eduV2_Login") === "true") renderDashboard();
         });
 
+        // Prosedur Kirim Data Form Login
         function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-login');
@@ -205,7 +227,11 @@
 
             fetch(SCRIPT_URL, {
                 method: "POST",
-                body: JSON.stringify({ action: "login", email: document.getElementById('email').value, password: document.getElementById('password').value })
+                body: JSON.stringify({ 
+                    action: "login", 
+                    email: document.getElementById('email').value, 
+                    password: document.getElementById('password').value 
+                })
             })
             .then(res => res.json())
             .then(data => {
@@ -215,9 +241,11 @@
                     localStorage.setItem("eduV2_Role", data.user.peran);
                     localStorage.setItem("eduV2_Target", data.user.anak || "");
                     renderDashboard();
-                } else { alert("Kredensial salah atau tidak terdaftar!"); }
+                } else { 
+                    alert("Kredensial login salah atau akun tidak terdaftar!"); 
+                }
             })
-            .catch(() => alert("Koneksi gagal! Periksa URL Apps Script Web App Anda."))
+            .catch(() => alert("Koneksi ke sistem cloud gagal! Periksa kembali URL Apps Script Anda."))
             .finally(() => { btn.disabled = false; btn.innerText = "Masuk Sistem"; });
         }
 
@@ -227,6 +255,7 @@
             document.getElementById('login-screen').classList.remove('hidden');
         }
 
+        // Pengaturan Hak Akses Antarmuka (UI Role-Based)
         function renderDashboard() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('dashboard-screen').classList.remove('hidden');
@@ -235,7 +264,6 @@
             document.getElementById('user-name').innerText = localStorage.getItem("eduV2_Name");
             document.getElementById('user-role').innerText = role;
 
-            // Pengaturan Visibilitas Panel Berdasarkan Role Akses
             const panelGuru = document.getElementById('panel-guru');
             const panelDisplay = document.getElementById('panel-display');
             const forumSection = document.getElementById('forum-section');
@@ -247,25 +275,58 @@
             } else {
                 panelGuru.classList.add('hidden');
                 panelDisplay.classList.replace('lg:col-span-8', 'lg:col-span-12');
-                // Forum terbuka untuk Guru dan Siswa saja
-                if(role === "Siswa") forumSection.classList.remove('hidden');
-                else forumSection.classList.add('hidden');
+                
+                if(role === "Siswa") {
+                    forumSection.classList.remove('hidden');
+                } else {
+                    forumSection.classList.add('hidden');
+                }
             }
 
             syncSystemData();
         }
 
+        // Sinkronisasi Mengambil Data dari Google Sheets (GET)
         function syncSystemData() {
             const role = localStorage.getItem("eduV2_Role");
             const targetAnak = localStorage.getItem("eduV2_Target");
             const namaSiswa = localStorage.getItem("eduV2_Name");
 
-            document.getElementById('badge-progres-scope').innerText = role === "OrangTua" ? `Anak: ${targetAnak}` : (role === "Pengawas" ? "Seluruh Sekolah (Makro)" : `Scope: ${role}`);
+            const badgeScope = document.getElementById('badge-progres-scope');
+            if(role === "OrangTua") {
+                badgeScope.innerText = `Anak: ${targetAnak}`;
+            } else if(role === "Pengawas") {
+                badgeScope.innerText = "Seluruh Sekolah (Makro)";
+            } else if(role === "Siswa") {
+                badgeScope.innerText = `Profil: ${namaSiswa}`;
+            } else {
+                badgeScope.innerText = `Scope: ${role}`;
+            }
 
             fetch(SCRIPT_URL)
             .then(res => res.json())
             .then(data => {
-                // 1. RENDER MATERI & KELAS VIRTUAL
+                
+                // [OTOMATISASI BARU]: Ambil data nama siswa dari sheet User (jika dikirim oleh backend) atau kumpulkan nama unik dari progres untuk mengisi select dropdown guru
+                if (role === "Guru") {
+                    // Kumpulkan semua nama unik bertipe peran siswa dari tabel progres
+                    let siswaSet = new Set();
+                    data.progres.forEach(p => { if(p.siswa) siswaSet.add(p.siswa.trim()); });
+                    
+                    const dropdownSiswa = document.getElementById('prog-siswa');
+                    // Simpan data lama yang sedang dipilih agar tidak ter-reset acak saat refresh data
+                    const selectedVal = dropdownSiswa.value;
+                    
+                    dropdownSiswa.innerHTML = '<option value="">-- Pilih Siswa Terdaftar --</option>';
+                    siswaSet.forEach(nama => {
+                        dropdownSiswa.innerHTML += `<option value="${nama}">${nama}</option>`;
+                    });
+                    
+                    // Kembalikan ke value semula jika ada
+                    if(selectedVal) dropdownSiswa.value = selectedVal;
+                }
+
+                // 1. RENDER DATA SINKRONISASI MATERI KELAS
                 const matContainer = document.getElementById('materi-container');
                 matContainer.innerHTML = data.materi.length ? '' : '<p class="text-slate-400 italic">Belum ada materi pelajaran yang diinput.</p>';
                 data.materi.forEach(m => {
@@ -273,39 +334,45 @@
                         <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
                             <div class="flex justify-between font-bold text-slate-700"><span>${m.judul}</span><span class="text-blue-600">[${m.mapel}]</span></div>
                             <p class="text-slate-500 text-[11px]">${m.deskripsi || '-'}</p>
-                            <div class="flex gap-2 pt-1">
-                                ${m.link ? `<a href="${m.link}" target="_blank" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold"><i class="fa-solid fa-file-pdf mr-1"></i> Buka Materi</a>` : ''}
-                                ${m.meet ? `<a href="${m.meet}" target="_blank" class="text-[10px] bg-rose-100 text-rose-700 px-2 py-1 rounded font-bold"><i class="fa-solid fa-video mr-1"></i> Masuk Kelas Virtual</a>` : ''}
+                            <div class="flex flex-wrap gap-2 pt-1">
+                                ${m.link ? `<a href="${m.link}" target="_blank" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold hover:bg-blue-200 transition"><i class="fa-solid fa-file-pdf mr-1"></i> Buka Materi</a>` : ''}
+                                ${m.meet ? `<a href="${m.meet}" target="_blank" class="text-[10px] bg-rose-100 text-rose-700 px-2 py-1 rounded font-bold hover:bg-rose-200 transition"><i class="fa-solid fa-video mr-1"></i> Masuk Kelas Virtual</a>` : ''}
+                                ${m.absen ? `<a href="${m.absen}" target="_blank" class="text-[10px] bg-amber-100 text-amber-800 px-2 py-1 rounded font-bold hover:bg-amber-200 transition"><i class="fa-solid fa-clipboard-user mr-1"></i> Isi Absensi Kehadiran</a>` : ''}
                             </div>
                         </div>`;
                 });
 
-                // 2. RENDER ALAT EVALUASI
+                // 2. RENDER DATA ALAT EVALUASI (KUIS/TUGAS)
                 const evContainer = document.getElementById('evaluasi-container');
-                evContainer.innerHTML = data.evaluasi.length ? '' : '<p class="text-slate-400 italic">Belum ada tugas atau kuis.</p>';
+                evContainer.innerHTML = data.evaluasi.length ? '' : '<p class="text-slate-400 italic">Belum ada tugas atau kuis yang dibagikan.</p>';
                 data.evaluasi.forEach(e => {
                     const badgeTipe = e.tipe === "Kuis" ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800';
                     evContainer.innerHTML += `
                         <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
                             <div class="flex justify-between font-bold text-slate-700"><span>${e.judul}</span><span class="px-1.5 rounded text-[10px] ${badgeTipe}">${e.tipe}</span></div>
                             <p class="text-slate-500 text-[11px] font-medium">Mapel: ${e.mapel}</p>
-                            <p class="text-slate-400 text-[11px]">${e.instruksi || '-'}</p>
+                            <p class="text-slate-400 text-[11px] whitespace-pre-line">${e.instruksi || '-'}</p>
+                            ${e.link_tugas ? `
+                            <div class="pt-2">
+                                <a href="${e.link_tugas}" target="_blank" class="text-[10px] inline-block bg-emerald-600 text-white px-2.5 py-1 rounded font-bold hover:bg-emerald-700 transition shadow-sm"><i class="fa-solid fa-pen-to-square mr-1"></i> Kerjakan ${e.tipe} Di Sini</a>
+                            </div>` : ''}
                         </div>`;
                 });
 
-                // 3. RENDER TABEL PROGRES (DENGAN LOGIKA FILTERING)
+                // 3. RENDER TABEL PROGRES
                 const tbody = document.getElementById('progres-table-body');
                 tbody.innerHTML = '';
                 
                 let filteredProgres = data.progres;
+                
                 if(role === "OrangTua") {
-                    filteredProgres = data.progres.filter(p => p.siswa.toLowerCase() === targetAnak.toLowerCase());
+                    filteredProgres = data.progres.filter(p => p.siswa.trim().toLowerCase() === targetAnak.trim().toLowerCase());
                 } else if(role === "Siswa") {
-                    filteredProgres = data.progres.filter(p => p.siswa.toLowerCase() === namaSiswa.toLowerCase());
-                } // Pengawas & Guru melihat *secara keseluruhan*
+                    filteredProgres = data.progres.filter(p => p.siswa.trim().toLowerCase() === namaSiswa.trim().toLowerCase());
+                }
 
                 if(!filteredProgres.length) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">Tidak ada data progres belajar yang sesuai scope akses Anda.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">Tidak ada laporan capaian progres belajar yang tercatat.</td></tr>`;
                 } else {
                     filteredProgres.forEach(p => {
                         tbody.innerHTML += `
@@ -313,57 +380,84 @@
                                 <td class="p-2.5 font-medium text-slate-700">${p.siswa}</td>
                                 <td class="p-2.5">${p.mapel}</td>
                                 <td class="p-2.5 text-center font-bold text-blue-600">${p.nilai}</td>
-                                <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100">${p.status}</span></td>
+                                <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">${p.status}</span></td>
                             </tr>`;
                     });
                 }
 
-                // 4. RENDER FORUM DISKUSI
+                // 4. RENDER ISI FORUM DISKUSI
                 const diskContainer = document.getElementById('diskusi-container');
                 diskContainer.innerHTML = '';
                 data.diskusi.forEach(d => {
-                    const isGuru = d.peran === "Guru" ? "border-l-2 border-blue-500 pl-2 bg-blue-50/50" : "";
+                    const isGuru = d.peran === "Guru" ? "border-l-4 border-blue-500 pl-2 bg-blue-50/60" : "bg-slate-50/50 pl-2";
                     diskContainer.innerHTML += `
                         <div class="p-2 rounded-lg ${isGuru}">
                             <div class="flex items-center gap-1.5"><span class="font-bold text-slate-700">${d.nama}</span><span class="text-[9px] text-slate-400">(${d.peran}) - ${d.waktu}</span></div>
                             <p class="text-slate-600 mt-0.5">${d.pesan}</p>
                         </div>`;
                 });
+            })
+            .catch(err => {
+                console.error("Sinkronisasi gagal:", err);
             });
         }
 
-        // AKSI POST DATA GURU
+        // AKSI KIRIM DATA FORM (POST)
         function saveMateri(e) {
             e.preventDefault();
             executePost({
-                action: "addMateri", mapel: document.getElementById('mat-mapel').value, judul: document.getElementById('mat-judul').value,
-                deskripsi: document.getElementById('mat-desk').value, link_materi: document.getElementById('mat-link').value,
-                link_meet: document.getElementById('mat-meet').value, guru: localStorage.getItem("eduV2_Name")
-            }, "Materi berhasil dirilis!");
+                action: "addMateri", 
+                mapel: document.getElementById('mat-mapel').value, 
+                judul: document.getElementById('mat-judul').value,
+                deskripsi: document.getElementById('mat-desk').value, 
+                link_materi: document.getElementById('mat-link').value,
+                link_meet: document.getElementById('mat-meet').value, 
+                absen: document.getElementById('mat-absen').value, // PAYLOAD BARU: LINK ABSENSI
+                guru: localStorage.getItem("eduV2_Name")
+            }, "Materi & Link Absensi berhasil dirilis!");
+            e.target.reset();
         }
 
         function saveEvaluasi(e) {
             e.preventDefault();
             executePost({
-                action: "addEvaluasi", mapel: document.getElementById('ev-mapel').value, tipe: document.getElementById('ev-tipe').value,
-                judul_tugas: document.getElementById('ev-judul').value, kapit_ins: document.getElementById('ev-ins').value
-            }, "Alat evaluasi berhasil dibagikan!");
+                action: "addEvaluasi", 
+                mapel: document.getElementById('ev-mapel').value, 
+                tipe: document.getElementById('ev-tipe').value,
+                judul_tugas: document.getElementById('ev-judul').value, 
+                instruksi: document.getElementById('ev-ins').value, 
+                link_tugas: document.getElementById('ev-link').value // PAYLOAD BARU: LINK KERJAKAN TUGAS
+            }, "Alat evaluasi & link pengerjaan berhasil dibagikan!");
+            e.target.reset();
         }
 
         function saveProgres(e) {
             e.preventDefault();
+            const selectSiswa = document.getElementById('prog-siswa');
+            if(!selectSiswa.value) {
+                alert("Silakan pilih nama siswa terlebih dahulu!");
+                return;
+            }
             executePost({
-                action: "addProgres", nama_siswa: document.getElementById('prog-siswa').value, mapel: document.getElementById('prog-mapel').value,
-                capaian_nilai: document.getElementById('prog-nilai').value, status_progres: document.getElementById('prog-status').value
+                action: "addProgres", 
+                nama_siswa: selectSiswa.value, // DIAMBIL DARI SELECTION OTOMATIS
+                mapel: document.getElementById('prog-mapel').value,
+                capaian_nilai: document.getElementById('prog-nilai').value, 
+                status_progres: document.getElementById('prog-status').value
             }, "Progres belajar siswa diperbarui!");
+            e.target.reset();
         }
 
         function sendDiskusi(e) {
             e.preventDefault();
+            const msgInput = document.getElementById('forum-msg');
             executePost({
-                action: "addDiskusi", nama: localStorage.getItem("eduV2_Name"), peran: localStorage.getItem("eduV2_Role"), pesan: document.getElementById('forum-msg').value
+                action: "addDiskusi", 
+                nama: localStorage.getItem("eduV2_Name"), 
+                peran: localStorage.getItem("eduV2_Role"), 
+                pesan: msgInput.value
             }, "", true);
-            document.getElementById('forum-msg').value = '';
+            msgInput.value = '';
         }
 
         function executePost(payload, alertMsg, silent = false) {

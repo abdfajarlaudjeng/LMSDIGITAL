@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduConnect V2 - LMS Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .portal-bg { background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%); }
+        .slide { opacity: 0; transition: opacity 1s ease-in-out; position: absolute; inset: 0; }
+        .slide.active { opacity: 1; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans antialiased text-slate-800">
+
+    <div id="login-screen" class="portal-bg min-h-screen flex items-center justify-center p-0 sm:p-6">
+        <div class="bg-white w-full max-w-5xl min-h-[600px] sm:rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+            
+            <div class="hidden lg:block lg:col-span-6 relative bg-slate-900 overflow-hidden text-white">
+                <div class="slide active">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-30">
+                    <div class="absolute bottom-12 left-8 right-8 z-10">
+                        <span class="bg-blue-600 text-xs font-bold px-3 py-1 rounded-full">Integrasi Ruang Belajar</span>
+                        <h3 class="text-2xl font-bold mt-2">Materi & Kelas Virtual</h3>
+                        <p class="text-sm text-slate-300 mt-1">Satu pintu akses sinkronisasi materi pelajaran, tugas kuis, dan ruang tatap muka virtual untuk Siswa.</p>
+                    </div>
+                </div>
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-30">
+                    <div class="absolute bottom-12 left-8 right-8 z-10">
+                        <span class="bg-emerald-600 text-xs font-bold px-3 py-1 rounded-full">Forum Komunitas</span>
+                        <h3 class="text-2xl font-bold mt-2">Diskusi Interaktif</h3>
+                        <p class="text-sm text-slate-300 mt-1">Ruang diskusi terbuka real-time mempertemukan ide belajar antara Guru dan Siswa.</p>
+                    </div>
+                </div>
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-30">
+                    <div class="absolute bottom-12 left-8 right-8 z-10">
+                        <span class="bg-purple-600 text-xs font-bold px-3 py-1 rounded-full">Monitoring Transparan</span>
+                        <h3 class="text-2xl font-bold mt-2">Pelacakan Progres Capaian</h3>
+                        <p class="text-sm text-slate-300 mt-2">Pengawas sekolah memonitor makro, sementara Orang Tua mengawal mikro perkembangan anak.</p>
+                    </div>
+                </div>
+                <div class="absolute bottom-6 left-8 flex gap-2 z-20">
+                    <div class="dot w-6 h-1.5 bg-white rounded-full transition-all"></div>
+                    <div class="dot w-2 h-1.5 bg-white/50 rounded-full transition-all"></div>
+                    <div class="dot w-2 h-1.5 bg-white/50 rounded-full transition-all"></div>
+                </div>
+            </div>
+
+            <div class="col-span-1 lg:col-span-6 flex flex-col justify-center p-8 sm:p-12">
+                <div class="mb-6">
+                    <div class="bg-blue-700 w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl mb-3"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h2 class="text-2xl font-black text-slate-900">EduConnect Workspace</h2>
+                    <p class="text-sm text-slate-500 mt-1">Masuk sebagai Guru, Siswa, Orang Tua, atau Pengawas</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email Pengguna</label>
+                        <input type="email" id="email" required placeholder="nama@edu.com" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none transition bg-slate-50">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
+                        <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none transition bg-slate-50">
+                    </div>
+                    <button type="submit" id="btn-login" class="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-xl font-bold transition">Masuk Sistem <i class="fa-solid fa-right-to-bracket ml-2"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-screen" class="min-h-screen hidden">
+        <header class="bg-slate-900 text-white py-4 px-6 shadow-md flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight flex items-center gap-2"><i class="fa-solid fa-layer-group text-blue-500"></i> Portal Pembelajaran Digital</h1>
+                <p class="text-xs text-slate-400">Pengguna: <span id="user-name" class="font-bold text-white">Nama</span> | Hak Akses: <span id="user-role" class="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-[11px] font-bold">Role</span></p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="syncSystemData()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl transition font-medium"><i class="fa-solid fa-arrows-rotate mr-1"></i> Sinkronisasi Data</button>
+                <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-sm px-4 py-2 rounded-xl transition font-medium"><i class="fa-solid fa-power-off mr-1"></i> Keluar</button>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <div id="panel-guru" class="lg:col-span-4 space-y-6 hidden">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                    <h3 class="font-bold text-slate-800 border-b pb-2 mb-3 text-sm"><i class="fa-solid fa-book text-blue-600 mr-2"></i> Materi & Kelas Virtual</h3>
+                    <form onsubmit="saveMateri(event)" class="space-y-3 text-xs">
+                        <input type="text" id="mat-mapel" placeholder="Nama Mapel (ex: Matematika)" required class="w-full p-2 border rounded-lg">
+                        <input type="text" id="mat-judul" placeholder="Judul Materi Pembelajaran" required class="w-full p-2 border rounded-lg">
+                        <textarea id="mat-desk" placeholder="Ringkasan materi atau instruksi..." class="w-full p-2 border rounded-lg"></textarea>
+                        <input type="url" id="mat-link" placeholder="Link Materi (Google Drive/PDF)" class="w-full p-2 border rounded-lg">
+                        <input type="url" id="mat-meet" placeholder="Link Kelas Virtual (Google Meet/Zoom)" class="w-full p-2 border rounded-lg">
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition">Rilis ke Siswa</button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                    <h3 class="font-bold text-slate-800 border-b pb-2 mb-3 text-sm"><i class="fa-solid fa-square-poll-horizontal text-emerald-600 mr-2"></i> Alat Evaluasi</h3>
+                    <form onsubmit="saveEvaluasi(event)" class="space-y-3 text-xs">
+                        <input type="text" id="ev-mapel" placeholder="Nama Mapel" required class="w-full p-2 border rounded-lg">
+                        <select id="ev-tipe" class="w-full p-2 border rounded-lg bg-white">
+                            <option value="Tugas">Tugas Rumah</option>
+                            <option value="Kuis">Kuis Online</option>
+                        </select>
+                        <input type="text" id="ev-judul" placeholder="Judul Kuis/Tugas" required class="w-full p-2 border rounded-lg">
+                        <textarea id="ev-ins" placeholder="Tulis instruksi pengerjaan..." class="w-full p-2 border rounded-lg"></textarea>
+                        <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded-lg font-bold hover:bg-emerald-700 transition">Bagikan Alat Evaluasi</button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                    <h3 class="font-bold text-slate-800 border-b pb-2 mb-3 text-sm"><i class="fa-solid fa-chart-line text-purple-600 mr-2"></i> Capaian & Pelacakan Progres</h3>
+                    <form onsubmit="saveProgres(event)" class="space-y-3 text-xs">
+                        <input type="text" id="prog-siswa" placeholder="Nama Lengkap Siswa" required class="w-full p-2 border rounded-lg">
+                        <input type="text" id="prog-mapel" placeholder="Mata Pelajaran" required class="w-full p-2 border rounded-lg">
+                        <input type="number" id="prog-nilai" placeholder="Capaian Nilai (0-100)" required class="w-full p-2 border rounded-lg">
+                        <select id="prog-status" class="w-full p-2 border rounded-lg bg-white">
+                            <option value="Mulai Belajar">Mulai Belajar</option>
+                            <option value="Sedang Berprogres">Sedang Berprogres</option>
+                            <option value="Selesai Topik">Selesai Topik / Lulus</option>
+                        </select>
+                        <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg font-bold hover:bg-purple-700 transition">Update Progres Siswa</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="panel-display" class="lg:col-span-12 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                        <h4 class="font-bold text-slate-800 text-sm mb-3 flex justify-between items-center">
+                            <span><i class="fa-solid fa-graduation-cap text-blue-600 mr-2"></i> Sinkronisasi Materi & Kelas</span>
+                            <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">Live</span>
+                        </h4>
+                        <div id="materi-container" class="space-y-3 max-h-60 overflow-y-auto pr-1 text-xs">
+                            <p class="text-slate-400 italic">Memuat modul materi...</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                        <h4 class="font-bold text-slate-800 text-sm mb-3 flex justify-between items-center">
+                            <span><i class="fa-solid fa-paste text-emerald-600 mr-2"></i> Alat Evaluasi Terbuka (Kuis/Tugas)</span>
+                        </h4>
+                        <div id="evaluasi-container" class="space-y-3 max-h-60 overflow-y-auto pr-1 text-xs">
+                            <p class="text-slate-400 italic">Memuat daftar tugas...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex justify-between items-center">
+                        <span><i class="fa-solid fa-chart-bar text-purple-600 mr-2"></i> <span id="title-progres-table">Capaian & Pelacakan Progres Belajar</span></span>
+                        <span id="badge-progres-scope" class="text-[10px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">Memuat Scope...</span>
+                    </h4>
+                    <div class="overflow-x-auto text-xs">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 font-bold border-b">
+                                    <th class="p-2.5">Nama Siswa</th>
+                                    <th class="p-2.5">Mata Pelajaran</th>
+                                    <th class="p-2.5 text-center">Capaian Nilai</th>
+                                    <th class="p-2.5 text-center">Status Pelacakan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="progres-table-body">
+                                <tr>
+                                    <td colspan="4" class="p-4 text-center text-slate-400 italic">Memuat pangkalan progres...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="forum-section" class="bg-white p-5 rounded-2xl shadow-sm border hidden">
+                    <h4 class="font-bold text-slate-800 text-sm mb-3"><i class="fa-solid fa-comments text-amber-500 mr-2"></i> Forum Diskusi Komunitas Kelas</h4>
+                    <form onsubmit="sendDiskusi(event)" class="flex gap-2 mb-4">
+                        <input type="text" id="forum-msg" required placeholder="Tulis pertanyaan atau tanggapan diskusi kelas di sini..." class="w-full px-3 py-2 text-xs border rounded-xl outline-none focus:ring-2 focus:ring-amber-500">
+                        <button type="submit" class="bg-amber-500 text-slate-900 px-4 rounded-xl text-xs font-bold hover:bg-amber-400 transition">Kirim</button>
+                    </form>
+                    <div id="diskusi-container" class="space-y-3 max-h-48 overflow-y-auto text-xs pr-1"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // PASTIKAN URL SCRIPT INI ADALAH URL WEB APP YANG SUDAH ANDA DEPLOY DI GOOGLE APPS SCRIPT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiKCEhdgFzV4yc5FUNz92IOUcmz2ZUz_RyC7UU4x2DWbzqpS7SgVmYdy3zJzc2lxZD/exec"; 
+
+        // Slider Animasi Otomatis Layar Masuk
+        let curSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        setInterval(() => {
+            if(slides.length === 0) return;
+            slides[curSlide].classList.remove('active');
+            dots[curSlide].classList.remove('w-6', 'bg-white');
+            dots[curSlide].classList.add('w-2', 'bg-white/50');
+            curSlide = (curSlide + 1) % slides.length;
+            slides[curSlide].classList.add('active');
+            dots[curSlide].classList.remove('w-2', 'bg-white/50');
+            dots[curSlide].classList.add('w-6', 'bg-white');
+        }, 4000);
+
+        // Validasi Sesi Saat Reload Halaman
+        window.addEventListener('DOMContentLoaded', () => {
+            if(localStorage.getItem("eduV2_Login") === "true") renderDashboard();
+        });
+
+        // Prosedur Kirim Data Form Login
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login');
+            btn.disabled = true; btn.innerText = "Memverifikasi Akses...";
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ 
+                    action: "login", 
+                    email: document.getElementById('email').value, 
+                    password: document.getElementById('password').value 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    localStorage.setItem("eduV2_Login", "true");
+                    localStorage.setItem("eduV2_Name", data.user.nama);
+                    localStorage.setItem("eduV2_Role", data.user.peran);
+                    localStorage.setItem("eduV2_Target", data.user.anak || "");
+                    renderDashboard();
+                } else { 
+                    alert("Kredensial login salah atau akun tidak terdaftar!"); 
+                }
+            })
+            .catch(() => alert("Koneksi ke sistem cloud gagal! Periksa kembali URL Apps Script Anda."))
+            .finally(() => { btn.disabled = false; btn.innerText = "Masuk Sistem"; });
+        }
+
+        function handleLogout() {
+            localStorage.clear();
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        // Pengaturan Hak Akses Antarmuka (UI Role-Based)
+        function renderDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+
+            const role = localStorage.getItem("eduV2_Role");
+            document.getElementById('user-name').innerText = localStorage.getItem("eduV2_Name");
+            document.getElementById('user-role').innerText = role;
+
+            const panelGuru = document.getElementById('panel-guru');
+            const panelDisplay = document.getElementById('panel-display');
+            const forumSection = document.getElementById('forum-section');
+
+            if(role === "Guru") {
+                panelGuru.classList.remove('hidden');
+                panelDisplay.classList.replace('lg:col-span-12', 'lg:col-span-8');
+                forumSection.classList.remove('hidden');
+            } else {
+                // Sembunyikan panel input guru untuk Siswa, Orang Tua, dan Pengawas
+                panelGuru.classList.add('hidden');
+                panelDisplay.classList.replace('lg:col-span-8', 'lg:col-span-12');
+                
+                // Forum diskusi eksklusif hanya terbuka untuk Guru dan Siswa saja
+                if(role === "Siswa") {
+                    forumSection.classList.remove('hidden');
+                } else {
+                    forumSection.classList.add('hidden');
+                }
+            }
+
+            syncSystemData();
+        }
+
+        // Sinkronisasi Mengambil Data dari Google Sheets (GET)
+        function syncSystemData() {
+            const role = localStorage.getItem("eduV2_Role");
+            const targetAnak = localStorage.getItem("eduV2_Target");
+            const namaSiswa = localStorage.getItem("eduV2_Name");
+
+            // Mengubah penanda sub-judul tabel sesuai hak login
+            const badgeScope = document.getElementById('badge-progres-scope');
+            if(role === "OrangTua") {
+                badgeScope.innerText = `Anak: ${targetAnak}`;
+            } else if(role === "Pengawas") {
+                badgeScope.innerText = "Seluruh Sekolah (Makro)";
+            } else if(role === "Siswa") {
+                badgeScope.innerText = `Profil: ${namaSiswa}`;
+            } else {
+                badgeScope.innerText = `Scope: ${role}`;
+            }
+
+            fetch(SCRIPT_URL)
+            .then(res => res.json())
+            .then(data => {
+                // 1. RENDER DATA SINKRONISASI MATERI KELAS
+                const matContainer = document.getElementById('materi-container');
+                matContainer.innerHTML = data.materi.length ? '' : '<p class="text-slate-400 italic">Belum ada materi pelajaran yang diinput.</p>';
+                data.materi.forEach(m => {
+                    matContainer.innerHTML += `
+                        <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                            <div class="flex justify-between font-bold text-slate-700"><span>${m.judul}</span><span class="text-blue-600">[${m.mapel}]</span></div>
+                            <p class="text-slate-500 text-[11px]">${m.deskripsi || '-'}</p>
+                            <div class="flex gap-2 pt-1">
+                                ${m.link ? `<a href="${m.link}" target="_blank" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold hover:bg-blue-200 transition"><i class="fa-solid fa-file-pdf mr-1"></i> Buka Materi</a>` : ''}
+                                ${m.meet ? `<a href="${m.meet}" target="_blank" class="text-[10px] bg-rose-100 text-rose-700 px-2 py-1 rounded font-bold hover:bg-rose-200 transition"><i class="fa-solid fa-video mr-1"></i> Masuk Kelas Virtual</a>` : ''}
+                            </div>
+                        </div>`;
+                });
+
+                // 2. RENDER DATA ALAT EVALUASI (KUIS/TUGAS)
+                const evContainer = document.getElementById('evaluasi-container');
+                evContainer.innerHTML = data.evaluasi.length ? '' : '<p class="text-slate-400 italic">Belum ada tugas atau kuis yang dibagikan.</p>';
+                data.evaluasi.forEach(e => {
+                    const badgeTipe = e.tipe === "Kuis" ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800';
+                    evContainer.innerHTML += `
+                        <div class="p-3 bg-slate-50 border rounded-xl space-y-1">
+                            <div class="flex justify-between font-bold text-slate-700"><span>${e.judul}</span><span class="px-1.5 rounded text-[10px] ${badgeTipe}">${e.tipe}</span></div>
+                            <p class="text-slate-500 text-[11px] font-medium">Mapel: ${e.mapel}</p>
+                            <p class="text-slate-400 text-[11px] whitespace-pre-line">${e.instruksi || '-'}</p>
+                        </div>`;
+                });
+
+                // 3. RENDER TABEL PROGRES (LOGIKA PENYARINGAN PRIVASI DATA)
+                const tbody = document.getElementById('progres-table-body');
+                tbody.innerHTML = '';
+                
+                let filteredProgres = data.progres;
+                
+                if(role === "OrangTua") {
+                    // Orang tua tersinkronisasi hanya melihat data nama anaknya saja
+                    filteredProgres = data.progres.filter(p => p.siswa.trim().toLowerCase() === targetAnak.trim().toLowerCase());
+                } else if(role === "Siswa") {
+                    // Siswa tersinkronisasi murni hanya melihat riwayat progress-nya sendiri
+                    filteredProgres = data.progres.filter(p => p.siswa.trim().toLowerCase() === namaSiswa.trim().toLowerCase());
+                } // Jika Pengawas atau Guru, data dibiarkan tampil menyeluruh (makro)
+
+                if(!filteredProgres.length) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">Tidak ada laporan capares progres belajar yang tercatat.</td></tr>`;
+                } else {
+                    filteredProgres.forEach(p => {
+                        tbody.innerHTML += `
+                            <tr class="border-b hover:bg-slate-50 transition">
+                                <td class="p-2.5 font-medium text-slate-700">${p.siswa}</td>
+                                <td class="p-2.5">${p.mapel}</td>
+                                <td class="p-2.5 text-center font-bold text-blue-600">${p.nilai}</td>
+                                <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">${p.status}</span></td>
+                            </tr>`;
+                    });
+                }
+
+                // 4. RENDER ISI FORUM DISKUSI
+                const diskContainer = document.getElementById('diskusi-container');
+                diskContainer.innerHTML = '';
+                data.diskusi.forEach(d => {
+                    const isGuru = d.peran === "Guru" ? "border-l-4 border-blue-500 pl-2 bg-blue-50/60" : "bg-slate-50/50 pl-2";
+                    diskContainer.innerHTML += `
+                        <div class="p-2 rounded-lg ${isGuru}">
+                            <div class="flex items-center gap-1.5"><span class="font-bold text-slate-700">${d.nama}</span><span class="text-[9px] text-slate-400">(${d.peran}) - ${d.waktu}</span></div>
+                            <p class="text-slate-600 mt-0.5">${d.pesan}</p>
+                        </div>`;
+                });
+            })
+            .catch(err => {
+                console.error("Sinkronisasi gagal:", err);
+            });
+        }
+
+        // AKSI KIRIM DATA FORM (POST)
+        function saveMateri(e) {
+            e.preventDefault();
+            executePost({
+                action: "addMateri", 
+                mapel: document.getElementById('mat-mapel').value, 
+                judul: document.getElementById('mat-judul').value,
+                deskripsi: document.getElementById('mat-desk').value, 
+                link_materi: document.getElementById('mat-link').value,
+                link_meet: document.getElementById('mat-meet').value, 
+                guru: localStorage.getItem("eduV2_Name")
+            }, "Materi berhasil dirilis!");
+            e.target.reset();
+        }
+
+        function saveEvaluasi(e) {
+            e.preventDefault();
+            executePost({
+                action: "addEvaluasi", 
+                mapel: document.getElementById('ev-mapel').value, 
+                tipe: document.getElementById('ev-tipe').value,
+                judul_tugas: document.getElementById('ev-judul').value, 
+                instruksi: document.getElementById('ev-ins').value // Perbaikan: diubah dari kapit_ins menjadi instruksi agar pas dengan key Apps Script
+            }, "Alat evaluasi berhasil dibagikan!");
+            e.target.reset();
+        }
+
+        function saveProgres(e) {
+            e.preventDefault();
+            executePost({
+                action: "addProgres", 
+                nama_siswa: document.getElementById('prog-siswa').value, 
+                mapel: document.getElementById('prog-mapel').value,
+                capaian_nilai: document.getElementById('prog-nilai').value, 
+                status_progres: document.getElementById('prog-status').value
+            }, "Progres belajar siswa diperbarui!");
+            e.target.reset();
+        }
+
+        function sendDiskusi(e) {
+            e.preventDefault();
+            const msgInput = document.getElementById('forum-msg');
+            executePost({
+                action: "addDiskusi", 
+                nama: localStorage.getItem("eduV2_Name"), 
+                peran: localStorage.getItem("eduV2_Role"), 
+                pesan: msgInput.value
+            }, "", true);
+            msgInput.value = '';
+        }
+
+        function executePost(payload, alertMsg, silent = false) {
+            fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) })
+            .then(() => {
+                if(!silent) alert(alertMsg);
+                syncSystemData();
+            });
+        }
+    </script>
+</body>
+</html>

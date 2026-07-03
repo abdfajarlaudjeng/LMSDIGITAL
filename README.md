@@ -1,4 +1,4 @@
-# LMSDIGITAL
+# LMSDIGITAL EduConnect Workspace
 🌟 Cara Kerja Sincronisasi & Hak Akses Fitur:
 Guru Workspace: Memiliki 3 formulir panel kontrol khusus di sisi kiri untuk merilis modul materi, membuat tautan ruang kelas virtual (Zoom/Meet), membagikan kuis/tugas, serta meng-update angka capaian progres siswa.
 

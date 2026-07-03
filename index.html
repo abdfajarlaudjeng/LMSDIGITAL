@@ -119,7 +119,7 @@
                     <form onsubmit="saveProgres(event)" class="space-y-3 text-xs">
                         <label class="block text-[11px] font-bold text-slate-500 mb-0.5">Nama Lengkap Siswa</label>
                         <select id="prog-siswa" required class="w-full p-2 border rounded-lg bg-amber-50 font-medium">
-                            <option value="">-- Pilih Siswa Terdaftar --</option>
+                            <option value="">-- Memuat Daftar Siswa... --</option>
                         </select>
                         <input type="text" id="prog-mapel" placeholder="Mata Pelajaran" required class="w-full p-2 border rounded-lg">
                         <input type="number" id="prog-nilai" placeholder="Capaian Nilai (0-100)" required class="w-full p-2 border rounded-lg">
@@ -194,10 +194,7 @@
 
     <script>
         // PASTIKAN URL SCRIPT INI ADALAH URL WEB APP YANG SUDAH ANDA DEPLOY DI GOOGLE APPS SCRIPT
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHD7EOG0SHzFTswKCUH1zLqhFcF0mkqzufMdN9g45fHYOC39W6eMCZum5maeQlWJ2F/exec"; 
-
-        // Global array untuk menyimpan nama-nama siswa hasil sinkronisasi
-        let globalSiswaList = [];
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiKCEhdgFzV4yc5FUNz92IOUcmz2ZUz_RyC7UU4x2DWbzqpS7SgVmYdy3zJzc2lxZD/exec"; 
 
         // Slider Animasi Otomatis Layar Masuk
         let curSlide = 0;
@@ -307,22 +304,28 @@
             .then(res => res.json())
             .then(data => {
                 
-                // [OTOMATISASI BARU]: Ambil data nama siswa dari sheet User (jika dikirim oleh backend) atau kumpulkan nama unik dari progres untuk mengisi select dropdown guru
+                // [PERBAIKAN UTAMA]: Mengisi dropdown pilihan siswa murni dari data sheet "User" yang ber-peran "Siswa"
                 if (role === "Guru") {
-                    // Kumpulkan semua nama unik bertipe peran siswa dari tabel progres
-                    let siswaSet = new Set();
-                    data.progres.forEach(p => { if(p.siswa) siswaSet.add(p.siswa.trim()); });
-                    
                     const dropdownSiswa = document.getElementById('prog-siswa');
-                    // Simpan data lama yang sedang dipilih agar tidak ter-reset acak saat refresh data
                     const selectedVal = dropdownSiswa.value;
                     
                     dropdownSiswa.innerHTML = '<option value="">-- Pilih Siswa Terdaftar --</option>';
-                    siswaSet.forEach(nama => {
-                        dropdownSiswa.innerHTML += `<option value="${nama}">${nama}</option>`;
-                    });
                     
-                    // Kembalikan ke value semula jika ada
+                    if (data.users && data.users.length > 0) {
+                        // Saring hanya user yang memiliki peran "Siswa"
+                        const hanyaSiswa = data.users.filter(u => u.peran && u.peran.trim().toLowerCase() === "siswa");
+                        
+                        if(hanyaSiswa.length > 0) {
+                            hanyaSiswa.forEach(siswa => {
+                                dropdownSiswa.innerHTML += `<option value="${siswa.nama.trim()}">${siswa.nama.trim()}</option>`;
+                            });
+                        } else {
+                            dropdownSiswa.innerHTML = '<option value="">Tidak ada akun peran Siswa di sheet User</option>';
+                        }
+                    } else {
+                        dropdownSiswa.innerHTML = '<option value="">Gagal memuat data sheet User</option>';
+                    }
+                    
                     if(selectedVal) dropdownSiswa.value = selectedVal;
                 }
 
@@ -412,7 +415,7 @@
                 deskripsi: document.getElementById('mat-desk').value, 
                 link_materi: document.getElementById('mat-link').value,
                 link_meet: document.getElementById('mat-meet').value, 
-                absen: document.getElementById('mat-absen').value, // PAYLOAD BARU: LINK ABSENSI
+                absen: document.getElementById('mat-absen').value,
                 guru: localStorage.getItem("eduV2_Name")
             }, "Materi & Link Absensi berhasil dirilis!");
             e.target.reset();
@@ -426,7 +429,7 @@
                 tipe: document.getElementById('ev-tipe').value,
                 judul_tugas: document.getElementById('ev-judul').value, 
                 instruksi: document.getElementById('ev-ins').value, 
-                link_tugas: document.getElementById('ev-link').value // PAYLOAD BARU: LINK KERJAKAN TUGAS
+                link_tugas: document.getElementById('ev-link').value
             }, "Alat evaluasi & link pengerjaan berhasil dibagikan!");
             e.target.reset();
         }
@@ -440,7 +443,7 @@
             }
             executePost({
                 action: "addProgres", 
-                nama_siswa: selectSiswa.value, // DIAMBIL DARI SELECTION OTOMATIS
+                nama_siswa: selectSiswa.value,
                 mapel: document.getElementById('prog-mapel').value,
                 capaian_nilai: document.getElementById('prog-nilai').value, 
                 status_progres: document.getElementById('prog-status').value
